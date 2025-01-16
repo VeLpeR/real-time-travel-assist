@@ -1,1 +1,205 @@
-<p>home-feed works!</p>
+<div class="feed-container">
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-content">
+      <h1>Explore</h1>
+      <div class="action-buttons">
+        <button class="action-btn search-btn" [class.active]="isSearchExpanded" (click)="toggleSearch()">
+          <i class="fas" [class.fa-search]="!isSearchExpanded" [class.fa-times]="isSearchExpanded"></i>
+          <span>{{ isSearchExpanded ? 'Cancel' : 'Search' }}</span>
+        </button>
+        <button class="action-btn filter-btn" [class.active]="isFilterModalOpen" (click)="toggleFilterModal()">
+          <i class="fas fa-filter"></i>
+          <span>Filter</span>
+          <span class="filter-count" *ngIf="activeFilters > 0">{{activeFilters}}</span>
+        </button>
+        <button class="action-btn post-btn" (click)="openPostModal()">
+          <i class="fas fa-plus"></i>
+          <span>Post Query</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-container" *ngIf="isSearchExpanded">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="search" 
+               placeholder="Search for travel help..." 
+               aria-label="Search queries"
+               [(ngModel)]="searchQuery"
+               (input)="onSearch()"
+               #searchInput>
+      </div>
+    </div>
+  </header>
+
+  <!-- Feed Section -->
+  <main class="feed-section">
+    <!-- Example Post Card -->
+    <article class="post-card">
+      <div class="user-info">
+        <img src="https://png.pngtree.com/png-clipart/20240709/original/pngtree-casual-man-flat-design-avatar-profile-picture-vector-png-image_15526568.png" alt="User avatar" class="avatar">
+        <div class="user-details">
+          <h3 class="username">John Doe</h3>
+          <span class="post-time">10 minutes ago</span>
+        </div>
+        <div class="location-tag">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Central Park, NYC</span>
+        </div>
+      </div>
+      
+      <div class="post-content">
+        <h2 class="post-title">Best route to Times Square?</h2>
+        <p class="post-description">Looking for the quickest subway route from Central Park to Times Square. Any locals who can help? Need to get there before the Broadway show starts at 7 PM! 🎭</p>
+      </div>
+
+      <div class="post-stats">
+        <span><i class="fas fa-comment"></i> 5 responses</span>
+        <span><i class="fas fa-heart"></i> 12 likes</span>
+      </div>
+
+      <button class="respond-btn">Respond</button>
+    </article>
+
+    <article class="post-card">
+      <div class="user-info">
+        <img src="https://png.pngtree.com/png-clipart/20240709/original/pngtree-casual-man-flat-design-avatar-profile-picture-vector-png-image_15526568.png" alt="User avatar" class="avatar">
+        <div class="user-details">
+          <h3 class="username">Sarah Wilson</h3>
+          <span class="post-time">45 minutes ago</span>
+        </div>
+        <div class="location-tag">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Little Italy, NYC</span>
+        </div>
+      </div>
+      
+      <div class="post-content">
+        <h2 class="post-title">Authentic Italian Restaurant Recommendations?</h2>
+        <p class="post-description">First time in Little Italy! Looking for the most authentic Italian restaurant for dinner tonight. Preferably somewhere with amazing homemade pasta and a cozy atmosphere! 🍝 Budget friendly options appreciated! </p>
+      </div>
+
+      <div class="post-stats">
+        <span><i class="fas fa-comment"></i> 8 responses</span>
+        <span><i class="fas fa-heart"></i> 15 likes</span>
+      </div>
+
+      <button class="respond-btn">Respond</button>
+    </article>
+
+    <!-- More post cards would be repeated here -->
+  </main>
+
+  <!-- Floating Action Button -->
+  <button class="fab" aria-label="Create new post">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Footer Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" aria-label="Home feed">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" aria-label="Notifications">
+      <i class="fas fa-bell"></i>
+      <span>Notifications</span>
+    </button>
+    <button class="nav-item" aria-label="Profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </button>
+    <button class="nav-item" aria-label="Settings">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Filter Modal (hidden by default) -->
+  <div class="filter-modal" *ngIf="isFilterModalOpen" (click)="closeFilterModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Filter Posts</h2>
+        <button class="close-btn" (click)="closeFilterModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <section class="filter-section">
+        <h3>Location Range</h3>
+        <select [(ngModel)]="filters.range" aria-label="Distance range">
+          <option value="">Any Distance</option>
+          <option value="1">Within 1 km</option>
+          <option value="5">Within 5 km</option>
+          <option value="10">Within 10 km</option>
+        </select>
+      </section>
+
+      <section class="filter-section">
+        <h3>Categories</h3>
+        <div class="category-options">
+          <label *ngFor="let category of categories">
+            <input type="checkbox" 
+                   [value]="category.value" 
+                   [(ngModel)]="category.checked"> 
+            {{category.label}}
+          </label>
+        </div>
+      </section>
+
+      <section class="filter-section">
+        <h3>Time Frame</h3>
+        <select [(ngModel)]="filters.timeFrame" aria-label="Time frame">
+          <option value="">All Time</option>
+          <option value="recent">Most Recent</option>
+          <option value="24h">Past 24 Hours</option>
+          <option value="week">Past Week</option>
+          <option value="trending">Trending</option>
+        </select>
+      </section>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" (click)="resetFilters()">Reset</button>
+        <button class="cancel-btn" (click)="closeFilterModal()">Cancel</button>
+        <button class="primary-btn" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add this new post modal section at the bottom of the template -->
+  <div class="post-modal" [hidden]="!isPostModalOpen">
+    <div class="modal-content">
+      <h2>Post a Query</h2>
+      
+      <div class="form-group">
+        <label for="queryTitle">Title</label>
+        <input type="text" 
+               id="queryTitle" 
+               placeholder="What's your question?"
+               [(ngModel)]="newPost.title">
+      </div>
+
+      <div class="form-group">
+        <label for="queryLocation">Location</label>
+        <input type="text" 
+               id="queryLocation" 
+               placeholder="Where is this about?"
+               [(ngModel)]="newPost.location">
+      </div>
+
+      <div class="form-group">
+        <label for="queryDescription">Description</label>
+        <textarea id="queryDescription" 
+                  placeholder="Provide more details about your query..."
+                  [(ngModel)]="newPost.description"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closePostModal()">Cancel</button>
+        <button class="submit-btn" (click)="submitPost()">Post Query</button>
+      </div>
+    </div>
+  </div>
+</div>
+
